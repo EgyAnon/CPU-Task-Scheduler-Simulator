@@ -77,12 +77,21 @@ void ProcessList::addProcess(Process* newProcess, std::function<bool(Process*, P
 }
 
 bool Process::compareByArrivalTime(Process* p1, Process* p2){
+    if(p1->arrivalTime == p2->arrivalTime){
+        return p1->pid > p2->pid; //if arrival time is the same, sort by pid
+    }
     return p1->arrivalTime > p2->arrivalTime;
 };
 bool Process::compareByRemainingBurstTime(Process* p1, Process* p2){
+    if(p1->remainingBurstTime == p2->remainingBurstTime){
+        return p1->pid > p2->pid; //if arrival time is the same, sort by pid
+    }
     return p1->remainingBurstTime > p2->remainingBurstTime;
 };
 bool Process::compareByPriority(Process* p1, Process* p2){
+    if(p1->priority == p2->priority){
+        return p1->pid > p2->pid; //if arrival time is the same, sort by pid
+    }
     return p1->priority > p2->priority;
 };
 bool Process::compareFalse(Process* P1, Process* P2){
@@ -155,4 +164,8 @@ void ProcessList::printList(){
         current = current->next;
     }
     std::cout<<"\nList Size: "<<this->size<<"\n";
+}
+
+void Process::resetID(){
+    Process::id = 0;
 }

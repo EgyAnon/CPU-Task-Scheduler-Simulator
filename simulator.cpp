@@ -31,7 +31,7 @@ void Simulator::delayedAdd(Process* newProcess, size_t delay_s){
         return simulationRunning.load();
     });
 
-    std::this_thread::sleep_for(std::chrono::seconds(delay_s));
+    std::this_thread::sleep_for(std::chrono::milliseconds(delay_s));
     {
         std::lock_guard<std::mutex> queueLock(scheduleQueueMtx);
         scheduleQueue.push(newProcess);
@@ -53,40 +53,34 @@ void Simulator::setScheduler(std::string schedulerName, size_t timeQuantum){
             &startTime
         );
         if(schedulerName == "RR"){
-            this->scheduler->compareRule = Process::compareFalse;
-            this->scheduler->isPreemptive = false;
+            this->scheduler->setCompareRule(Process::compareFalse);
+            this->scheduler->setPreemptive(false);
             setRunner("RR", timeQuantum);
         }
 
         else{
             if(schedulerName == "FCFS"){
-                this->scheduler->compareRule = Process::compareByArrivalTime;
-                this->scheduler->isPreemptive = false;
+                this->scheduler->setCompareRule(Process::compareByArrivalTime);
+            this->scheduler->setPreemptive(false);
             }
             else if(schedulerName == "SJF Preemptive"){
-                this->scheduler->compareRule = Process::compareByRemainingBurstTime;
-                this->scheduler->isPreemptive = true;
+                this->scheduler->setCompareRule(Process::compareByRemainingBurstTime);
+                this->scheduler->setPreemptive(true);
             }
             else if(schedulerName == "SJF Non-Preemptive"){
-                this->scheduler->compareRule = Process::compareByRemainingBurstTime;
-                this->scheduler->isPreemptive = false;
+                this->scheduler->setCompareRule(Process::compareByRemainingBurstTime);
+                this->scheduler->setPreemptive(false);
             }
 
             else if(schedulerName == "Priority Preemptive"){
-                this->scheduler->compareRule = Process::compareByPriority;
-                this->scheduler->isPreemptive = true;
+                this->scheduler->setCompareRule(Process::compareByPriority);
+                this->scheduler->setPreemptive(true);
             }
 
             else if(schedulerName == "Priority Non-Preemptive"){
-                this->scheduler->compareRule = Process::compareByPriority;
-                this->scheduler->isPreemptive = false;
+                this->scheduler->setCompareRule(Process::compareByPriority);
+                this->scheduler->setPreemptive(false);
             }
-
-            else if(schedulerName == "RR"){
-                this->scheduler->compareRule = Process::compareFalse;
-                this->scheduler->isPreemptive = false;
-            }
-
             else{
                 throw std::invalid_argument("Scheduler type not recognized!");
                 return;
@@ -148,13 +142,14 @@ void Simulator::start(){
     simulationRunning = false;
     std::cout<<"Simulation finished!"<<std::endl;
     displayStatistics();
+    displayExecutionLog();
 }
 
 void Simulator::displayStatistics(){
     size_t totalTurnaroundTime = 0;
     size_t totalWaitingTime = 0;
     size_t totalResponseTime = 0;
-    size_t totalProcesses = Process::id;
+    size_t totalProcesses = Process::getNumerOfProcesses();
 
     size_t tmp_turnaround, tmp_waiting, tmp_response;
 
@@ -179,4 +174,13 @@ void Simulator::displayStatistics(){
     std::cout<<"Average waiting time: "<<static_cast<double>(totalWaitingTime)/static_cast<double>(totalProcesses)<<"\n";
     std::cout<<"Average response time: "<<static_cast<double>(totalResponseTime)/static_cast<double>(totalProcesses)<<"\n";
     std::cout<<"===============================================================\n";
+}
+
+void Simulator::displayExecutionLog(){
+    std::cout<<"==========================Execution Log===============================\n";
+    std::cout<<"Process ID\t|\tStart Time\t\t|\tEnd Time\n";
+    for(auto& log : executionLog){
+        std::cout<<"P"<<std::get<0>(log)<<"\t\t|\t\t"<<std::get<1>(log)<<"\t\t|\t"<<std::get<2>(log)<<"\n";
+    }
+    std::cout<<"=======================================================================\n";
 }

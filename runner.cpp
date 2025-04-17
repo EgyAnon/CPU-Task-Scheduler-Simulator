@@ -1,9 +1,7 @@
 #include "runner.hpp"
 
 inline size_t Runner::getCurrentTime(){
-    std::chrono::system_clock::time_point currentTimePoint = std::chrono::system_clock::now();
-    size_t currentTime = (size_t)std::chrono::round<std::chrono::seconds>(currentTimePoint-*startTime).count();
-    return currentTime;
+    return (size_t)std::chrono::round<std::chrono::seconds>(std::chrono::system_clock::now()-*startTime).count();
 }
 
 void Runner::run(){
@@ -35,44 +33,43 @@ void Runner::run(){
             
             size_t slice_end = getCurrentTime();
             
+            if(slice_end != slice_start){
+                executionLog->push_back(std::make_tuple(runningProcess->pid, slice_start, slice_end));
+            }
+            else{
+                runningProcess->servedBefore = false;
+            }
+
             if(interrupted){
                 size_t duration_s = slice_end-slice_start;
                 std::cout << "[" << getCurrentTime() << "|Runner]: Preemption request received!\n";
             
                 // 1. Update remaining burst time
-                if (duration_s >= runningProcess->remainingBurstTime)
+                if (duration_s >= runningProcess->remainingBurstTime){
                     runningProcess->remainingBurstTime = 0;
-                else
+                }
+                else{
                     runningProcess->remainingBurstTime -= duration_s;
-                /* executionLog->push_back(
-                    std::make_tuple(
-                        runningProcess->pid,
-                        slice_start,
-                        slice_end
-                    ));
-             */
-                /* std::cout << "[" << getCurrentTime() << "|Runner]: Spent " << duration_s
-                            << " seconds in process P" << runningProcess->pid << ". "
-                            << runningProcess->remainingBurstTime << " seconds remaining\n";
-                */
-                // 2. Put process back at front of processList
+                }
+
+                // 3. Put process back at front of processList
                 processList->pushFront(runningProcess);
-                runningProcess = nullptr;
             
-                // 4. Notify scheduler that runner has completed preemption
+                // 5. Set runner status to preempted
                 {
                     std::lock_guard<std::mutex> schedLock(*schedulerMtx);
                     runnerPreempted->store(true);
                 }
 
+                //6. Notify the scheduler that the runner is gracefully Preempted
                 schedulerCV->notify_one();
 
+                //7. Wait for the scheduler to perofrm the scheduling
                 {
                     runnerCV->wait(runnerLock, [this](){
                         return !runnerPreempted->load();
                     });
                 }
-                
             }
             
             else{
@@ -88,7 +85,8 @@ void Runner::run(){
         else if((*delayedProcesses) != 0){
             std::cout<<"["<<getCurrentTime()<<"|Runner]: Waiting for new process...\n";
             runnerPreempted->store(true);
-            std::unique_lock<std::mutex> runnerLock(*runnerMtx);
+            std::mutex tmpMtx;
+            std::unique_lock<std::mutex> runnerLock(tmpMtx);
             runnerCV->wait(runnerLock,
                 [this](){
                     return !processList->empty();
@@ -96,7 +94,6 @@ void Runner::run(){
         }
 
         else{
-            runnerFinished->store(true);
             break;
         }
     }
@@ -113,7 +110,7 @@ void Runner_RR::run(){
         if(runningProcess){
             runnerPreempted->store(false);
             //obtain the time slice start time
-            auto slice_start = std::chrono::system_clock::now();
+            size_t slice_start = getCurrentTime();
             
             std::cout<<"["<<getCurrentTime()<<"|Runner]: Running process P"<<runningProcess->pid<<"\n";
 
@@ -127,11 +124,18 @@ void Runner_RR::run(){
             bool finished = timeQuantum >= runningProcess->remainingBurstTime;
             std::this_thread::sleep_for(std::chrono::seconds(finished ? runningProcess->remainingBurstTime : timeQuantum));
 
-            auto slice_end = std::chrono::system_clock::now();
+            size_t slice_end = getCurrentTime();
             
+            //4. Store time slice in execution log
+            if(slice_end != slice_start){
+                executionLog->push_back(std::make_tuple(runningProcess->pid, slice_start, slice_end));
+            }
+            else{
+                runningProcess->servedBefore = false;
+            }
+
             if(!finished){
-                auto duration_s = static_cast<unsigned long long>(std::chrono::round<std::chrono::seconds>(slice_end - slice_start).count());
-                //std::cout << "[" << getCurrentTime() << "|Runner]: Preemption request received!\n";
+                size_t duration_s = slice_end-slice_start;
             
                 // 1. Update remaining burst time
                 if (duration_s >= runningProcess->remainingBurstTime)
@@ -141,12 +145,11 @@ void Runner_RR::run(){
             
                 // 2. Put process back at front of processList
                 processList->pushBack(runningProcess);
-                runningProcess = nullptr;  
             }
             
             else{
                 //we know that the process finished its burst time.
-                runningProcess ->finishTime = (size_t)std::chrono::round<std::chrono::seconds>(slice_end-*startTime).count();
+                runningProcess ->finishTime = slice_end;
                 runningProcess -> remainingBurstTime = 0;
                 std::cout<<"["<<getCurrentTime()<<"|Runner]: Process P"<<runningProcess->pid<<" - Finished\n";
             }
@@ -155,7 +158,8 @@ void Runner_RR::run(){
         else if((*delayedProcesses) != 0){
             std::cout<<"["<<getCurrentTime()<<"|Runner]: Waiting for new process...\n";
             runnerPreempted->store(true);
-            std::unique_lock<std::mutex> runnerLock(*runnerMtx);
+            std::mutex tmpMtx;
+            std::unique_lock<std::mutex> runnerLock(tmpMtx);
             runnerCV->wait(runnerLock,
                 [this](){
                     return !processList->empty();
@@ -163,10 +167,13 @@ void Runner_RR::run(){
         }
 
         else{
-            runnerPreempted->store(true);
             break;
         }
     }
     runnerFinished->store(true);
     std::cout<<"[Runner] No more processes to run.\n";
 }
+
+void Runner_RR::setTimeQuantum(size_t _timeQuantum){
+    this->timeQuantum = _timeQuantum;
+};

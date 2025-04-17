@@ -45,10 +45,11 @@ class Simulator {
     std::vector<std::tuple<size_t, size_t, size_t>> executionLog;
 
     Simulator(){processVector.reserve(100);};
-    void addProcess(size_t arrivalTime, size_t burstTime, size_t priority);
-    
+    void addProcess(size_t arrivalTime, size_t burstTime, size_t priority = 0);
     void setScheduler(std::string schedulerName, size_t timeQuantum = 1);
     void start();
+
+    void printExecutionLog();
 
 };
     

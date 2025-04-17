@@ -37,7 +37,8 @@ class Runner {
     /* Runner specific*/
     Process* runningProcess = nullptr;
     
-    size_t getCurrentTime();
+    /*funcitons*/
+    inline size_t getCurrentTime();
     
     public:
     Runner(
@@ -95,4 +96,5 @@ class Runner_RR : public Runner{
     {};
     
     void run() override;
+    void setTimeQuantum(size_t _timeQuantum);
 };

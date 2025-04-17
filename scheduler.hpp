@@ -16,7 +16,7 @@
  */
 
 class Scheduler {
-    public:
+    private:
     /* Data Structures */
     ProcessList* processList;
     std::vector<Process>* processVector;
@@ -27,23 +27,24 @@ class Scheduler {
     std::mutex* scheduleQueueMtx;
     std::mutex* runnerMtx;
     std::mutex* schedulerMtx;
-
+    
     /*Conditional Variables*/
     std::condition_variable* schedulerCV;
     std::condition_variable* runnerCV;
     std::condition_variable* queueCV;
-
+    
     /* Signals */
     std::atomic<size_t>* delayedProcesses;
     std::atomic<bool>* runnerFinished, *runnerPreempted, *preemptionRequest;
     
     /* Timing */
     std::chrono::system_clock::time_point* startTime;
-
+    
     /* Scheduler-specific */
     std::function<bool(Process*, Process*)> compareRule;
     bool isPreemptive;
-
+    
+    public:
     Scheduler(
         /*Data Structures*/
         ProcessList* _processList,
@@ -61,17 +62,15 @@ class Scheduler {
         std::condition_variable* _runnerCV,
         std::condition_variable* _queueCV,
 
-        //deadlock
-
         /* Signals */
         std::atomic<size_t>* _delayedProcesses,
         std::atomic<bool>* _runnerFinished,
         std::atomic<bool>* _runnerPreempted,
         std::atomic<bool>* _preemptionRequest,
-
+        
         /* Timing */
         std::chrono::system_clock::time_point* _startTime,
-
+        
         /* Scheduler-specific */
         std::function<bool(Process*, Process*)> _compareRule = Process::compareByArrivalTime,
         bool _isPreemptive = false
@@ -96,7 +95,11 @@ class Scheduler {
     {};
 
     void insertProcess(Process* newProcess);
-
+    void setCompareRule(std::function<bool(Process*, Process*)> newCompareRule){
+        compareRule = newCompareRule;
+    };
+    void setPreemptive(bool newIsPreemptive){
+        isPreemptive = newIsPreemptive;
+    };
     void run();
-    size_t getCurrentTime();
 };

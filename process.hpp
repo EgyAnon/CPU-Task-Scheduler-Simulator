@@ -8,9 +8,9 @@
 
 class Process{   
     private:
+    static std::atomic<size_t> id;
 
     public:
-    static std::atomic<size_t> id;
     bool servedBefore{false};
     size_t arrivalTime;
     size_t burstTime;
@@ -23,11 +23,17 @@ class Process{
     
     Process(size_t _arrivalTime, std::size_t _BurstTime, std::size_t _priority  = 0);
     Process() = delete;
+    
+    static size_t getNumerOfProcesses(){
+        return id.load();
+    };
 
     static bool compareByArrivalTime(Process* p1, Process* p2);
     static bool compareByRemainingBurstTime(Process* p1, Process* p2);
     static bool compareByPriority(Process* p1, Process* p2);
     static bool compareFalse(Process* p1, Process* p2);
+
+    static void resetID();
 };
 
 class ProcessNode{
