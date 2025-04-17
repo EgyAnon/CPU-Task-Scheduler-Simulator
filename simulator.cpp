@@ -1,15 +1,5 @@
 #include "simulator.hpp"
 #include <stdexcept>
-void Simulator::addProcess(Process P){
-    Process* newProcess;
-    {
-        std::lock_guard<std::mutex> vectorLock(processVectorMtx);
-        processVector[P.pid] = P;
-        newProcess = &processVector[P.pid];
-    }
-    std::this_thread::sleep_for(std::chrono::seconds(P.arrivalTime));
-    scheduler->insertProcess(newProcess);
-}
 
 void Simulator::addProcess(size_t arrivalTime, size_t burstTime, size_t priority){
     Process* newProcess;
@@ -31,7 +21,7 @@ void Simulator::delayedAdd(Process* newProcess, size_t delay_s){
         return simulationRunning.load();
     });
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(delay_s));
+    std::this_thread::sleep_for(std::chrono::seconds(delay_s));
     {
         std::lock_guard<std::mutex> queueLock(scheduleQueueMtx);
         scheduleQueue.push(newProcess);
