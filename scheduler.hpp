@@ -1,6 +1,4 @@
 #pragma once
-
-#pragma once
 #include "process.hpp"
 #include <condition_variable>
 #include <mutex>
@@ -37,9 +35,6 @@ class Scheduler {
     std::atomic<size_t>* delayedProcesses;
     std::atomic<bool>* runnerFinished, *runnerPreempted, *preemptionRequest;
     
-    /* Timing */
-    std::chrono::system_clock::time_point* startTime;
-    
     /* Scheduler-specific */
     std::function<bool(Process*, Process*)> compareRule;
     bool isPreemptive;
@@ -68,11 +63,8 @@ class Scheduler {
         std::atomic<bool>* _runnerPreempted,
         std::atomic<bool>* _preemptionRequest,
         
-        /* Timing */
-        std::chrono::system_clock::time_point* _startTime,
-        
         /* Scheduler-specific */
-        std::function<bool(Process*, Process*)> _compareRule = Process::compareByArrivalTime,
+        std::function<bool(Process*, Process*)> _compareRule = Process::CompareByArrivalTime,
         bool _isPreemptive = false
     ):
     processList(_processList),
@@ -89,7 +81,6 @@ class Scheduler {
     runnerFinished(_runnerFinished),
     runnerPreempted(_runnerPreempted),
     preemptionRequest(_preemptionRequest),
-    startTime(_startTime),
     compareRule(_compareRule),
     isPreemptive(_isPreemptive)
     {};

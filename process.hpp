@@ -1,5 +1,4 @@
 #pragma once   
-
 #include <cstddef> 
 #include <functional>
 #include <atomic>
@@ -8,62 +7,74 @@
 
 class Process{   
     private:
-    static std::atomic<size_t> id;
+    //This static and atomic unsigned variable is used to give every process
+    //a unique id.
+    static std::atomic<size_t> _id;
 
     public:
-    bool servedBefore{false};
-    size_t arrivalTime;
-    size_t burstTime;
-    size_t remainingBurstTime;
-    size_t priority;
-    size_t pid;
+    bool servedBefore{false}; //has this process been served before inside the runner?
 
-    size_t firstResponseTime{0};
-    size_t finishTime{0};
+    size_t arrival_time; //arrival time 
+    size_t burst_time;   //burst time (not to be modified)
+    size_t remaining_burst_time;  //remanining burst time in ms
+    size_t priority; //the lower this value, the higher the priority 
+    size_t pid; //the unique process id
+
+    size_t first_response_time{0};    //time until first response in ms
+    size_t finish_time{0};   //in-simulation finish time (in ms)
     
-    Process(size_t _arrivalTime, std::size_t _BurstTime, std::size_t _priority  = 0);
-    Process() = delete;
+    Process(size_t arrival_time, std::size_t burst_time, std::size_t priority  = 0);
+    Process() = delete; 
     
-    static size_t getNumerOfProcesses(){
-        return id.load();
+    static size_t GetNumerOfProcesses(){
+        return _id.load();
     };
 
-    static bool compareByArrivalTime(Process* p1, Process* p2);
-    static bool compareByRemainingBurstTime(Process* p1, Process* p2);
-    static bool compareByPriority(Process* p1, Process* p2);
-    static bool compareFalse(Process* p1, Process* p2);
-
+    //These comparators are used later to insert processes inside the process list
+    static bool CompareByArrivalTime(Process* p1, Process* p2);
+    static bool CompareByRemainingBurstTime(Process* p1, Process* p2);
+    static bool CompareByPriority(Process* p1, Process* p2);
+    static bool CompareFalse(Process* p1, Process* p2);
+    
+    //reset the static id to 0 to restart the count.
     static void resetID();
 };
 
+//This class is used to create the linked list of process pointers.
+//We let the data of the node be a pointer and not the actual process
+//So that the actual process objects remain accessible by their
+//pid from the processVector.
 class ProcessNode{
     public:
-    Process* process;
+    Process* process;   //pointer to the actual process object
     ProcessNode* next;
     ProcessNode* previous;
 
-    ProcessNode(Process* _process):
-        process(_process),
+    ProcessNode(Process* process):
+        process(process),
         next(nullptr),
         previous(nullptr)
     {};
 };
 
+//A thread-safe doubly-linked list of pointers to objects of type Process
 class ProcessList{
     private:
-    std::mutex listMutex;
-    ProcessNode* head;
-    ProcessNode* tail;
-    size_t size;
+    std::mutex _list_mutex;
+    ProcessNode* _head;
+    ProcessNode* _tail;
+    size_t _size;
 
     public:
-    ProcessList() : head(nullptr), tail(nullptr), size(0){};
-    void addProcess(Process* newProcess);   //default adds to tail
-    void addProcess(Process* newProcess, std::function<bool(Process*, Process*)> compareRule); //functor
-    Process* getHeadProcess();
-    void pushFront(Process* p);
-    void pushBack(Process* p);
-    bool empty();
-    void printList();
+    ProcessList() : _head(nullptr), _tail(nullptr), _size(0){};
+    void AddProcess(Process* newProcess);   //default adds to tail
+    void AddProcess(Process* newProcess, std::function<bool(Process*, Process*)> compareRule);
+    
+    Process* GetHeadProcess();
+    void PushFront(Process* p);
+    void PushBack(Process* p);
+
+    bool Empty();
+    void PrintList(); //for debugging
 };
 

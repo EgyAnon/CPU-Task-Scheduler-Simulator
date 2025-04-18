@@ -13,6 +13,8 @@ bool compareLogs(
 
 void setupSimulator(Simulator& simulator) {
     simulator.setScheduler("SJF Preemptive");
+    simulator.setSpeedup(10);
+
     // Test 1–6: Base cases
     simulator.addProcess(0, 10); // P0
     simulator.addProcess(5, 3); // P1
@@ -30,31 +32,25 @@ void setupSimulator(Simulator& simulator) {
     for (int i = 0; i < 10; ++i) {
         simulator.addProcess(40, 1 + (i % 3)); // P11–P20
     }
-
+    
     // Test 8: Back-to-back tiny jobs
-    simulator.addProcess(50, 1); // P21
-    simulator.addProcess(51, 1); // P22
-    simulator.addProcess(52, 1); // P23
-
+    simulator.addProcess(70, 1); // P21
+    simulator.addProcess(71, 1); // P22
+    simulator.addProcess(72, 1); // P23
+    
     // Test 9: One big process interrupted by short ones
-    simulator.addProcess(60, 20); // P24
+    simulator.addProcess(75, 10); // P24
     for (int i = 0; i < 5; ++i) {
-        simulator.addProcess(61 + i, 1); // P25–P29
+        simulator.addProcess(76 + i, 1); // P25–P29
     }
 
-    // Test 10: Starvation
-    simulator.addProcess(70, 10); // P30
-    for (int i = 0; i < 5; ++i) {
-        simulator.addProcess(71 + i, 1); // P31–P35
-    }
-
-    // Test 11: End + arrival same time
-    simulator.addProcess(80, 5); // P36
-    simulator.addProcess(85, 2); // P37
+    // Test 10: End + arrival same time
+    simulator.addProcess(95, 5); // P30
+    simulator.addProcess(95, 2); // P31
 }
 
 int main() {
-    const int NUM_RUNS = 10;
+    const int NUM_RUNS = 20;
     std::vector<std::tuple<size_t, size_t, size_t>> baselineLog;
     bool allSame = true;
 
@@ -62,6 +58,7 @@ int main() {
         Simulator sim = Simulator();
         setupSimulator(sim);
         sim.start();
+        
         auto& log = sim.executionLog;
 
         if (i == 0) {

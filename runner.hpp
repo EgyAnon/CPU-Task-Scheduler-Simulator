@@ -9,11 +9,8 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
+#include "timer.hpp"
 
-/**
- * Responsible for executing processes.
- * Executes one process at a time from the processList and handles preemption.
- */
 class Runner {
     protected:
     /*  Data Structures */
@@ -32,13 +29,11 @@ class Runner {
     std::atomic<bool> *runnerFinished, *runnerPreempted, *preemptionRequest;
     
     /* Timing */
-    std::chrono::system_clock::time_point* startTime;
-    
+    Timer* simulationTimer;
+    size_t* SPEEDUP;
+
     /* Runner specific*/
     Process* runningProcess = nullptr;
-    
-    /*funcitons*/
-    inline size_t getCurrentTime();
     
     public:
     Runner(
@@ -54,13 +49,14 @@ class Runner {
         std::atomic<bool>* _runnerFinished,
         std::atomic<bool>* _runnerPreempted, std::atomic<bool>* _preemptionRequest,
 
-        std::chrono::system_clock::time_point* _startTime
+        Timer* _simulationTimer, size_t* _SPEEDUP
     ):
     processList(_processList), executionLog(_executionLog),
     runnerMtx(_runnerMtx), schedulerMtx(_schedulerMtx), schedulerCV(_schedulerCV), runnerCV(_runnerCV),
     delayedProcesses(_delayedProcesses),
     runnerFinished(_runnerFinished), runnerPreempted(_runnerPreempted),
-    preemptionRequest(_preemptionRequest), startTime(_startTime)
+    preemptionRequest(_preemptionRequest), simulationTimer(_simulationTimer),
+    SPEEDUP(_SPEEDUP)
     {};
     
     virtual void run();
@@ -83,14 +79,14 @@ class Runner_RR : public Runner{
         std::atomic<bool>* _runnerFinished,
         std::atomic<bool>* _runnerPreempted, std::atomic<bool>* _preemptionRequest,
 
-        std::chrono::system_clock::time_point* _startTime,
-        size_t _timeQuantum
+        Timer* _simulationTimer,
+        size_t _timeQuantum, size_t* _SPEEDUP
     ):
     Runner(
         _processList, _executionLog,
         _runnerMtx, _schedulerMtx, _schedulerCV, _runnerCV,
         _delayedProcesses, _runnerFinished, _runnerPreempted, _preemptionRequest,
-        _startTime
+        _simulationTimer, _SPEEDUP
     ),
     timeQuantum(_timeQuantum)
     {};

@@ -1,7 +1,7 @@
 #include "scheduler.hpp"
 
 void Scheduler::insertProcess(Process* newProcess){
-    processList->addProcess(newProcess,compareRule);
+    processList->AddProcess(newProcess,compareRule);
 }
 
 void Scheduler::run(){
@@ -20,7 +20,6 @@ void Scheduler::run(){
             queueLock.unlock(); //release the queue lock
             
             if (this->isPreemptive) {
-        
                 // 1. Request preemption
                 {
                     std::lock_guard<std::mutex> lock(*runnerMtx);
@@ -33,12 +32,13 @@ void Scheduler::run(){
                 // 3. Wait for runner to confirm it has stopped
                 {
                     std::unique_lock<std::mutex> schedLock(*schedulerMtx);
-                    std::cout<<"[Scheduler] waiting for runner to be preempted\n";
+                    //std::cout<<"[Scheduler] waiting for runner to be preempted\n";
                     schedulerCV->wait(schedLock, [this]() {
                         return runnerPreempted->load();
                     });
                 }
             }
+            //std::cout<<"[Scheduler] Adding process P"<<newProcess->pid<<"\n";
             insertProcess(newProcess);
             (*delayedProcesses)--;
             queueLock.lock();
