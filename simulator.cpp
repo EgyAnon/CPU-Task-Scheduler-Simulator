@@ -15,8 +15,14 @@ void Simulator::setSpeedup(size_t _speedup){
     }
 }
 
+bool Simulator::IsRunning(){
+    return simulationRunning.load();
+}
 
-void Simulator::addProcess(size_t arrival_time, size_t burstTime, size_t priority){
+size_t Simulator::getSimulationTime(){
+    return simulationTimer.getTime_ms();
+}
+size_t Simulator::addProcess(size_t arrival_time, size_t burstTime, size_t priority){
     Process* newProcess;
     Process P(arrival_time*1000, burstTime*1000, priority);
     {
@@ -26,6 +32,7 @@ void Simulator::addProcess(size_t arrival_time, size_t burstTime, size_t priorit
     newProcess = &processVector[P.pid];
     delayedProcesses++;
     delayedQueue.push(newProcess);
+    return P.pid;
 }
 
 void Simulator::addDelayedProcesses(){
@@ -49,7 +56,7 @@ void Simulator::addDelayedProcesses(){
     }
 }
 
-void Simulator::addProcessDynamically(size_t _burstTime, size_t _priority){
+size_t Simulator::addProcessDynamically(size_t _burstTime, size_t _priority){
     Process P(simulationTimer.getTime_ms(), _burstTime*1000, _priority);
     {
         std::lock_guard<std::mutex> lk(processVectorMtx);
@@ -63,6 +70,7 @@ void Simulator::addProcessDynamically(size_t _burstTime, size_t _priority){
         std::cout<<"Added new process: P"<<P.pid<<"\n";
         queueCV.notify_one();
     }
+    return P.pid;
 }
 
 void Simulator::setScheduler(std::string schedulerName, size_t timeQuantum){
@@ -70,10 +78,11 @@ void Simulator::setScheduler(std::string schedulerName, size_t timeQuantum){
         std::cout<<"Can't change scheduler type mid-simulation";
         return;
     }
+    //TODO: delete previous scheduler
     else{
         this->scheduler = new Scheduler(
-            &processList, &processVector, &scheduleQueue,
-            &processVectorMtx, &scheduleQueueMtx, &runnerMtx, &schedulerMtx,
+            &processList, &scheduleQueue,
+            &scheduleQueueMtx, &runnerMtx, &schedulerMtx,
             &schedulerCV, &runnerCV, &queueCV,
             &delayedProcesses,
             &runnerFinished, &runnerPreempted, &preemptionRequest
@@ -88,7 +97,7 @@ void Simulator::setScheduler(std::string schedulerName, size_t timeQuantum){
         else{
             if(schedulerName == "FCFS"){
                 this->scheduler->setCompareRule(Process::CompareByArrivalTime);
-            this->scheduler->setPreemptive(false);
+                this->scheduler->setPreemptive(false);
             }
             else if(schedulerName == "SJF Preemptive"){
                 this->scheduler->setCompareRule(Process::CompareByRemainingBurstTime);
@@ -123,23 +132,25 @@ void Simulator::setRunner(std::string runnerType, size_t timeQuantum){
         std::cout<<"Can't change runner type mid-simulation";
         return;
     }
-
+    //TODO: delete previous runner
     if(runnerType == "Regular"){
         this->runner = new Runner(
+            this,
             &processList, &executionLog,
             &runnerMtx, &schedulerMtx,
             &schedulerCV, &runnerCV, 
-            &delayedProcesses,
+            &delayedProcesses, &simulationRunning,
             &runnerFinished, &runnerPreempted, &preemptionRequest,
             &simulationTimer, &Speedup
         );
     }
     else if(runnerType == "RR"){
         this->runner = new Runner_RR(
+            this,
             &processList, &executionLog,
             &runnerMtx, &schedulerMtx,
             &schedulerCV, &runnerCV, 
-            &delayedProcesses,
+            &delayedProcesses, &simulationRunning,
             &runnerFinished, &runnerPreempted, &preemptionRequest,
             &simulationTimer, timeQuantum, &Speedup
         );
@@ -164,14 +175,26 @@ void Simulator::start(){
         std::thread schedulerThread(&Scheduler::run, scheduler);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         std::thread runnerThread(&Runner::run, runner);
-        
-        schedulerThread.join();
-        runnerThread.join();
+        schedulerThread.detach();
+        runnerThread.detach();
     }
-    simulationRunning = false;
     std::cout<<"Simulation finished!"<<std::endl;
     displayStatistics();
     displayExecutionLog();
+}
+
+void Simulator::onBurstTimeDecremented(size_t pid, size_t newTime){
+    emit signal_processBurstTimeUpdated(pid, newTime);
+}
+
+void Simulator::simulationFinished(){
+    simulationRunning = false;
+    emit signal_simulationFinished(getStatistics());
+}
+
+void Simulator::updateSimulationTimeGUI(){
+    double newTime = simulationTimer.getTime_ms()/1000.0;
+    emit signal_updateSimulationTime(newTime);
 }
 
 void Simulator::displayStatistics(){
@@ -196,6 +219,31 @@ void Simulator::displayStatistics(){
     std::cout<<"Average waiting time: "<<static_cast<double>(totalWaitingTime)/static_cast<double>(totalProcesses)<<"\n";
     std::cout<<"Average response time: "<<static_cast<double>(totalResponseTime)/static_cast<double>(totalProcesses)<<"\n";
     std::cout<<"===============================================================\n";
+}
+
+std::tuple<double,double,double> Simulator::getStatistics(){
+    size_t totalTurnaroundTime = 0;
+    size_t totalWaitingTime = 0;
+    size_t totalResponseTime = 0;
+    size_t totalProcesses = Process::GetNumerOfProcesses();
+
+    size_t tmp_turnaround, tmp_waiting, tmp_response;
+
+    for(size_t i = 0; i<totalProcesses; i++){
+        tmp_turnaround = processVector[i].finish_time - processVector[i].arrival_time;
+        tmp_waiting = tmp_turnaround - processVector[i].burst_time;
+        tmp_response = processVector[i].first_response_time- processVector[i].arrival_time;
+        totalTurnaroundTime += tmp_turnaround;
+        totalWaitingTime += tmp_waiting;
+        totalResponseTime += tmp_response;
+    }
+    std::tuple<double,double,double> result;
+    result = std::make_tuple(
+        static_cast<double>(totalTurnaroundTime)/(static_cast<double>(totalProcesses)*1000),
+        static_cast<double>(totalWaitingTime)/(static_cast<double>(totalProcesses)*1000),
+        static_cast<double>(totalResponseTime)/(static_cast<double>(totalProcesses)*1000)
+    );
+    return result;
 }
 
 void Simulator::displayExecutionLog(){

@@ -43,11 +43,9 @@ class Scheduler {
     Scheduler(
         /*Data Structures*/
         ProcessList* _processList,
-        std::vector<Process>* _processVector,
         std::queue<Process*>* _scheduleQueue,
 
         /*Mutexes*/
-        std::mutex* _processVectorMtx,
         std::mutex* _scheduleQueueMtx,
         std::mutex* _runnerMtx,
         std::mutex* _schedulerMtx,
@@ -68,9 +66,7 @@ class Scheduler {
         bool _isPreemptive = false
     ):
     processList(_processList),
-    processVector(_processVector),
     scheduleQueue(_scheduleQueue),
-    processVectorMtx(_processVectorMtx),
     scheduleQueueMtx(_scheduleQueueMtx),
     runnerMtx(_runnerMtx),
     schedulerMtx(_schedulerMtx),

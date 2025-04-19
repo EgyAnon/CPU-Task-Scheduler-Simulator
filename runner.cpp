@@ -1,4 +1,6 @@
 #include "runner.hpp"
+#include "simulator.hpp"
+
 
 void Runner::run(){
     while(*delayedProcesses || !processList->Empty()){
@@ -11,7 +13,7 @@ void Runner::run(){
             //obtain the time slice start time
             size_t slice_start = simulationTimer->getTime_ms();
             
-            std::cout<<"["<<slice_start<<"|Runner]: Running process P"<<runningProcess->pid<<"\n";
+            //std::cout<<"["<<slice_start<<"|Runner]: Running process P"<<runningProcess->pid<<"\n";
 
             //if this is the first time the process is being served, set the first response time
             if(!runningProcess->servedBefore){
@@ -31,8 +33,10 @@ void Runner::run(){
                     }
                 );  
                 if(!interrupted){
-                    runningProcess->remaining_burst_time -= 1000;
                     simulationTimer->incrementTime_ms(1000);
+                    runningProcess->remaining_burst_time -= 1000;
+                    simulator->updateSimulationTimeGUI();
+                    simulator->onBurstTimeDecremented(runningProcess->pid, runningProcess->remaining_burst_time);
                 }
             }
 
@@ -53,10 +57,6 @@ void Runner::run(){
             }
 
             if(interrupted){
-                 std::cout   << "[" << simulationTimer->getTime_s()
-                            << "|Runner]: Preemption request received!\n";
-             
-                // 3. Put process back at front of processList
                 processList->PushFront(runningProcess);
             
                 // 5. Set runner status to preempted
@@ -79,15 +79,15 @@ void Runner::run(){
             else{
                 //we know that the process finished its burst time.
                 runningProcess ->finish_time = simulationTimer->getTime_ms();
-                 std::cout<<"["<<simulationTimer->getTime_s()<<"|Runner]: Process P"
-                         <<runningProcess->pid<<" - Finished\n"; 
+                /* std::cout<<"["<<simulationTimer->getTime_s()<<"|Runner]: Process P"
+                         <<runningProcess->pid<<" - Finished\n";  */
             }
             runnerLock.unlock(); //release the runner lock
         }
         
         else if((*delayedProcesses) != 0){
-             std::cout   <<"["<<simulationTimer->getTime_s()
-                        <<"|Runner]: Waiting for new process...\n"; 
+            /* std::cout   <<"["<<simulationTimer->getTime_s() */
+            /*             <<"|Runner]: Waiting for new process...\n"; */ 
                         
             bool interrupted = false;
             std::mutex tmpMtx;
@@ -105,8 +105,9 @@ void Runner::run(){
                 );
                 if(!interrupted){
                     simulationTimer->incrementTime_ms(1000);
+                    simulator->updateSimulationTimeGUI();
                 }
-                std::cout<<"Current Time: "<<simulationTimer->getTime_s()<<"\n";
+                /* std::cout<<"Current Time: "<<simulationTimer->getTime_s()<<"\n"; */
             }
         }
 
@@ -115,6 +116,7 @@ void Runner::run(){
         }
     }
     runnerFinished->store(true);
+    simulator->simulationFinished();
     //td::cout<<"[Runner] No more processes to run.\n";
 }
 
@@ -129,8 +131,8 @@ void Runner_RR::run(){
             //obtain the time slice start time
             size_t slice_start = simulationTimer->getTime_ms();
             
-            std::cout<<"["<<simulationTimer->getTime_ms()
-            <<"|Runner]: Running process P" <<runningProcess->pid<<"\n";
+            /* std::cout<<"["<<simulationTimer->getTime_ms()
+            <<"|Runner]: Running process P" <<runningProcess->pid<<"\n"; */
 
             //if this is the first time the process is being served, set the first response time
             if(!runningProcess->servedBefore){
@@ -142,10 +144,12 @@ void Runner_RR::run(){
             bool finished = timeQuantum >= runningProcess->remaining_burst_time;
             size_t sleep_duration_ms =  ((finished)?runningProcess->remaining_burst_time:timeQuantum);
             while(sleep_duration_ms>0){
-                std::this_thread::sleep_for(std::chrono::milliseconds(500/(*SPEEDUP)));
-                simulationTimer->incrementTime_ms(500);
-                sleep_duration_ms-=500;
-                runningProcess->remaining_burst_time -= 500;
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000/(*SPEEDUP)));
+                simulationTimer->incrementTime_ms(1000);
+                sleep_duration_ms-=1000;
+                runningProcess->remaining_burst_time -= 1000;
+                simulator->updateSimulationTimeGUI();
+                simulator->onBurstTimeDecremented(runningProcess->pid, runningProcess->remaining_burst_time);
             }
 
             size_t slice_end = simulationTimer->getTime_ms();
@@ -167,13 +171,13 @@ void Runner_RR::run(){
             else{
                 //we know that the process finished its burst time.
                 runningProcess ->finish_time = slice_end;
-                std::cout<<"["<<simulationTimer->getTime_ms()<<"|Runner]: Process P"<<runningProcess->pid<<" - Finished\n";
+                /* std::cout<<"["<<simulationTimer->getTime_ms()<<"|Runner]: Process P"<<runningProcess->pid<<" - Finished\n"; */
             }
         }
         
         else if((*delayedProcesses) != 0){
-            std::cout   <<"["<<simulationTimer->getTime_ms()
-            <<"|Runner]: Waiting for new process...\n";
+            /* std::cout   <<"["<<simulationTimer->getTime_ms()
+            <<"|Runner]: Waiting for new process...\n"; */
             std::mutex tmpMtx;
             std::unique_lock<std::mutex> runnerLock(tmpMtx);
             runnerPreempted->store(true);
@@ -189,6 +193,7 @@ void Runner_RR::run(){
                 );
                 if(!interrupted){
                     simulationTimer->incrementTime_ms(500);
+                    simulator->updateSimulationTimeGUI();
                 }
             }
         }
@@ -198,7 +203,8 @@ void Runner_RR::run(){
         }
     }
     runnerFinished->store(true);
-    std::cout<<"[Runner] No more processes to run.\n";
+    simulator->simulationFinished();
+    /* std::cout<<"[Runner] No more processes to run.\n"; */
 }
 
 void Runner_RR::setTimeQuantum(size_t _timeQuantum){

@@ -2,12 +2,12 @@
 
 std::atomic<size_t> Process::_id{0};
 
-Process::Process(size_t arrival_time, std::size_t burst_time, std::size_t priority):
+Process::Process(size_t _arrival_time, std::size_t _burst_time, std::size_t _priority):
     //all time is in milliseconds
-    arrival_time(arrival_time),      
-    burst_time(burst_time),          
-    remaining_burst_time(burst_time),
-    priority(priority),
+    arrival_time(_arrival_time),      
+    burst_time(_burst_time),          
+    remaining_burst_time(_burst_time),
+    priority(_priority),
     pid(_id)
 {
     //ATOMIC INCREMENT

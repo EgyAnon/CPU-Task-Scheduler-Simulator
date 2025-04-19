@@ -28,7 +28,7 @@ class Process{
     
     static size_t GetNumerOfProcesses(){
         return _id.load();
-    };
+    }
 
     //These comparators are used later to insert processes inside the process list
     static bool CompareByArrivalTime(Process* p1, Process* p2);
@@ -50,8 +50,8 @@ class ProcessNode{
     ProcessNode* next;
     ProcessNode* previous;
 
-    ProcessNode(Process* process):
-        process(process),
+    ProcessNode(Process* _process):
+        process(_process),
         next(nullptr),
         previous(nullptr)
     {};

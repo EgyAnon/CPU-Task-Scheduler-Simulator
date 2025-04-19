@@ -1,14 +1,24 @@
 #pragma once
 #include "scheduler.hpp"
 #include "runner.hpp"
-#define MAX_SPEEDUP 60
+#include <QObject>
+
+#define MAX_SPEEDUP 80
 
 struct CompareByArrival {
     bool operator()(Process* a, Process* b) const;
 };
 
 
-class Simulator {
+class Simulator : public QObject
+{
+    Q_OBJECT
+
+    signals:
+    void signal_processBurstTimeUpdated(size_t pid, size_t newTime);
+    void signal_simulationFinished(std::tuple<double,double,double> result);
+    void signal_updateSimulationTime(double);
+
     private: 
     /*  Main Actors */
     Scheduler* scheduler = nullptr;
@@ -47,11 +57,19 @@ class Simulator {
     std::vector<std::tuple<size_t, size_t, size_t>> executionLog;
     Timer simulationTimer;
     
-    Simulator(){processVector.reserve(100);};
-    void addProcess(size_t arrivalTime, size_t burstTime, size_t priority = 0);
-    void addProcessDynamically(size_t burstTime, size_t priority = 0);
+    Simulator(){processVector.reserve(100);}
+    size_t addProcess(size_t arrivalTime, size_t burstTime, size_t priority = 0);
+    size_t addProcessDynamically(size_t burstTime, size_t priority = 0);
+    size_t getSimulationTime();
+    std::tuple<double,double,double> getStatistics();
     void setScheduler(std::string schedulerName, size_t timeQuantum = 1);
     void setSpeedup(size_t SPEEDUP = 1);
+    bool IsRunning();
+    void onBurstTimeDecremented(size_t pid, size_t newTime);
+    void simulationFinished();
+    void updateSimulationTimeGUI();
+
+
     void start();
     
     void printExecutionLog();
