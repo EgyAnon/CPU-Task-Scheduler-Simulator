@@ -7,6 +7,7 @@
 #include <chrono>
 #include <iostream>
 #include <queue>
+#include "timer.hpp"
 
 /**
  * Abstract base class for all scheduling algorithms.
@@ -34,6 +35,9 @@ class Scheduler {
     /* Signals */
     std::atomic<size_t>* delayedProcesses;
     std::atomic<bool>* runnerFinished, *runnerPreempted, *preemptionRequest;
+
+    /*Timer*/
+    Timer* simulationTimer;
     
     /* Scheduler-specific */
     std::function<bool(Process*, Process*)> compareRule;
@@ -60,7 +64,9 @@ class Scheduler {
         std::atomic<bool>* _runnerFinished,
         std::atomic<bool>* _runnerPreempted,
         std::atomic<bool>* _preemptionRequest,
-        
+
+        /*Timer*/
+        Timer* _simulationTimer,
         /* Scheduler-specific */
         std::function<bool(Process*, Process*)> _compareRule = Process::CompareByArrivalTime,
         bool _isPreemptive = false
@@ -77,16 +83,17 @@ class Scheduler {
     runnerFinished(_runnerFinished),
     runnerPreempted(_runnerPreempted),
     preemptionRequest(_preemptionRequest),
+    simulationTimer(_simulationTimer),
     compareRule(_compareRule),
     isPreemptive(_isPreemptive)
-    {};
+    {}
 
     void insertProcess(Process* newProcess);
     void setCompareRule(std::function<bool(Process*, Process*)> newCompareRule){
         compareRule = newCompareRule;
-    };
+    }
     void setPreemptive(bool newIsPreemptive){
         isPreemptive = newIsPreemptive;
-    };
+    }
     void run();
 };

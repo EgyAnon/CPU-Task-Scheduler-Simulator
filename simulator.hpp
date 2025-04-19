@@ -15,7 +15,7 @@ class Simulator : public QObject
     Q_OBJECT
 
     signals:
-    void signal_processBurstTimeUpdated(size_t pid, size_t newTime);
+    void signal_processBurstTimeUpdated(size_t pid, double newTime);
     void signal_simulationFinished(std::tuple<double,double,double> result);
     void signal_updateSimulationTime(double);
 
@@ -55,9 +55,14 @@ class Simulator : public QObject
     public:
     std::vector<Process> processVector;
     std::vector<std::tuple<size_t, size_t, size_t>> executionLog;
-    Timer simulationTimer;
+    Timer simulationTimer{this};
     
     Simulator(){processVector.reserve(100);}
+    ~Simulator(){
+        delete scheduler;
+        delete runner;
+    };
+
     size_t addProcess(size_t arrivalTime, size_t burstTime, size_t priority = 0);
     size_t addProcessDynamically(size_t burstTime, size_t priority = 0);
     size_t getSimulationTime();
@@ -68,7 +73,7 @@ class Simulator : public QObject
     void onBurstTimeDecremented(size_t pid, size_t newTime);
     void simulationFinished();
     void updateSimulationTimeGUI();
-
+    void resetSimulationData();
 
     void start();
     

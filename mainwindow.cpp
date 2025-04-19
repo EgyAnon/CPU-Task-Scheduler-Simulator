@@ -111,9 +111,17 @@ void MainWindow::on_pushButton_InsertProcess_released()
     tableItem_pid->setTextAlignment(Qt::AlignCenter);
     QTableWidgetItem* tableItem_priority = new QTableWidgetItem(QString::number(this->simulator.processVector[pid].priority));
     tableItem_priority->setTextAlignment(Qt::AlignCenter);
-    QTableWidgetItem* tableItem_arrivalTime = new QTableWidgetItem(QString::number(this->simulator.processVector[pid].arrival_time));
+    QTableWidgetItem* tableItem_arrivalTime = new QTableWidgetItem(
+        QString::number(
+            this->simulator.processVector[pid].arrival_time/1000.0f
+        )
+    );
     tableItem_arrivalTime->setTextAlignment(Qt::AlignCenter);
-    QTableWidgetItem* tableItem_burstTime = new QTableWidgetItem(QString::number(this->simulator.processVector[pid].burst_time));
+    QTableWidgetItem* tableItem_burstTime = new QTableWidgetItem(
+        QString::number(
+            this->simulator.processVector[pid].burst_time/1000.0f
+        )
+    );
     tableItem_burstTime->setTextAlignment(Qt::AlignCenter);
 
     // Add values to the table
@@ -145,36 +153,16 @@ void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
         ui->spinBox_Quantum->setVisible(true);
     }
 
-    else if(currentScheduler == "First-Come, First Serve"){
-        simulator.setScheduler("FCFS");
-    }
-
-    else if(currentScheduler == "Shortest Job First (Preemptive)"){
-        simulator.setScheduler("SJF Preemptive");
-    }
-
-    else if(currentScheduler == "Shortest Job First (Non-Preemptive)"){
-        simulator.setScheduler("SJF Non-Preemptive");
-    }
-
     else if(currentScheduler == "Priority (Preemptive)"){
         ui->lineEdit_Priority->setVisible(true);
         ui->label_Priority->setVisible(true);
         ui->processTable->setColumnHidden(1,false);
-
-        simulator.setScheduler("Priority Preemptive");
     }
 
     else if(currentScheduler == "Priority (Non-Preemptive)"){
         ui->lineEdit_Priority->setVisible(true);
         ui->label_Priority->setVisible(true);
         ui->processTable->setColumnHidden(1,false);
-
-        simulator.setScheduler("SJF Non-Preemptive");
-    }
-
-    else{
-        ui->label_ProgramMessages->setText("ERROR");
     }
 }
 
@@ -219,12 +207,13 @@ void MainWindow::on_pushButton_StartSimulation_released()
 
     ui->spinBox_Quantum->setDisabled(true);
     ui->comboBox->setDisabled(true);
-    ui->checkBox_instantSimulation->setDisabled(true);
+    //ui->checkBox_instantSimulation->setDisabled(true);
+    ui->pushButton_reset->setDisabled(true);
 
     simulator.start();
 }
 
-void MainWindow::updateBurstTime(size_t pid, size_t newTime){
+void MainWindow::updateBurstTime(size_t pid, double newTime){
     // Access the Remaining Burst Time in the third column (assuming it's column 2)
     QTableWidgetItem *burstTimeItem = ui->processTable->item(pid, 3);
     if (burstTimeItem) {
@@ -246,6 +235,7 @@ void MainWindow::on_simulationFinished(std::tuple<double,double,double> result){
     ui->comboBox->setDisabled(false);
     ui->checkBox_instantSimulation->setDisabled(false);
     ui->pushButton_StartSimulation->setEnabled(true);
+    ui->pushButton_reset->setEnabled(true);
 
     this->updateGanttChartWindow();
     ui->textEdit_Statistics->setText(
@@ -315,3 +305,21 @@ void MainWindow::on_updateSimulationTime(double newTime){
     ui->label_simulationTime->setText("Simulation Time: " + QString::number(newTime));
 }
 
+
+void MainWindow::on_pushButton_reset_released()
+{
+    //1. Clear Data From Backend
+    simulator.resetSimulationData();
+
+    //2. Clear GUI Data
+
+    //2.1 Clear Gantt Chart
+    ui->GanttChartWindow->scene()->clear();
+
+    //2.2 Clear Process Table
+    ui->processTable->setRowCount(0);
+    ui->processTable->clearContents();
+
+    //2.3 Clear Statistics
+    ui->textEdit_Statistics->clear();
+}

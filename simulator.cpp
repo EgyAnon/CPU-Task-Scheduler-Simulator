@@ -22,6 +22,7 @@ bool Simulator::IsRunning(){
 size_t Simulator::getSimulationTime(){
     return simulationTimer.getTime_ms();
 }
+
 size_t Simulator::addProcess(size_t arrival_time, size_t burstTime, size_t priority){
     Process* newProcess;
     Process P(arrival_time*1000, burstTime*1000, priority);
@@ -64,65 +65,74 @@ size_t Simulator::addProcessDynamically(size_t _burstTime, size_t _priority){
     }
     Process* newProcess = &processVector[P.pid];
     delayedProcesses++;
+    std::cout<<simulationTimer.getTime_s()<<"| delayedProcesses incremented\n";
+    std::cout.flush();
     {
         std::lock_guard<std::mutex>  lk(scheduleQueueMtx);
         scheduleQueue.push(newProcess);
         std::cout<<"Added new process: P"<<P.pid<<"\n";
-        queueCV.notify_one();
+        std::cout.flush();
     }
+    queueCV.notify_all();
+
     return P.pid;
 }
 
 void Simulator::setScheduler(std::string schedulerName, size_t timeQuantum){
     if(simulationRunning){
         std::cout<<"Can't change scheduler type mid-simulation";
+        std::cout.flush();
         return;
     }
-    //TODO: delete previous scheduler
+
+    if(scheduler){
+        delete scheduler;
+    }
+
+    this->scheduler = new Scheduler(
+        &processList, &scheduleQueue,
+        &scheduleQueueMtx, &runnerMtx, &schedulerMtx,
+        &schedulerCV, &runnerCV, &queueCV,
+        &delayedProcesses,
+        &runnerFinished, &runnerPreempted, &preemptionRequest,
+        &simulationTimer
+    );
+
+    if(schedulerName == "RR"){
+        this->scheduler->setCompareRule(Process::CompareFalse);
+        this->scheduler->setPreemptive(false);
+        setRunner("RR", timeQuantum*1000);
+    }
+
     else{
-        this->scheduler = new Scheduler(
-            &processList, &scheduleQueue,
-            &scheduleQueueMtx, &runnerMtx, &schedulerMtx,
-            &schedulerCV, &runnerCV, &queueCV,
-            &delayedProcesses,
-            &runnerFinished, &runnerPreempted, &preemptionRequest
-
-        );
-        if(schedulerName == "RR"){
-            this->scheduler->setCompareRule(Process::CompareFalse);
+        if(schedulerName == "FCFS"){
+            this->scheduler->setCompareRule(Process::CompareByArrivalTime);
             this->scheduler->setPreemptive(false);
-            setRunner("RR", timeQuantum*1000);
+        }
+        else if(schedulerName == "SJF Preemptive"){
+            this->scheduler->setCompareRule(Process::CompareByRemainingBurstTime);
+            this->scheduler->setPreemptive(true);
+        }
+        else if(schedulerName == "SJF Non-Preemptive"){
+            this->scheduler->setCompareRule(Process::CompareByRemainingBurstTime);
+            this->scheduler->setPreemptive(false);
         }
 
+        else if(schedulerName == "Priority Preemptive"){
+            this->scheduler->setCompareRule(Process::CompareByPriority);
+            this->scheduler->setPreemptive(true);
+        }
+
+        else if(schedulerName == "Priority Non-Preemptive"){
+            this->scheduler->setCompareRule(Process::CompareByPriority);
+            this->scheduler->setPreemptive(false);
+        }
         else{
-            if(schedulerName == "FCFS"){
-                this->scheduler->setCompareRule(Process::CompareByArrivalTime);
-                this->scheduler->setPreemptive(false);
-            }
-            else if(schedulerName == "SJF Preemptive"){
-                this->scheduler->setCompareRule(Process::CompareByRemainingBurstTime);
-                this->scheduler->setPreemptive(true);
-            }
-            else if(schedulerName == "SJF Non-Preemptive"){
-                this->scheduler->setCompareRule(Process::CompareByRemainingBurstTime);
-                this->scheduler->setPreemptive(false);
-            }
-
-            else if(schedulerName == "Priority Preemptive"){
-                this->scheduler->setCompareRule(Process::CompareByPriority);
-                this->scheduler->setPreemptive(true);
-            }
-
-            else if(schedulerName == "Priority Non-Preemptive"){
-                this->scheduler->setCompareRule(Process::CompareByPriority);
-                this->scheduler->setPreemptive(false);
-            }
-            else{
-                throw std::invalid_argument("Scheduler type not recognized!");
-                return;
-            }
-            setRunner("Regular");
+            throw std::invalid_argument("Scheduler type not recognized!");
+            return;
         }
+        setRunner("Regular");
+
 
     }
 }
@@ -130,9 +140,15 @@ void Simulator::setScheduler(std::string schedulerName, size_t timeQuantum){
 void Simulator::setRunner(std::string runnerType, size_t timeQuantum){
     if(simulationRunning){
         std::cout<<"Can't change runner type mid-simulation";
+        std::cout.flush();
         return;
     }
+
     //TODO: delete previous runner
+    if(runner){
+        delete runner;
+    }
+
     if(runnerType == "Regular"){
         this->runner = new Runner(
             this,
@@ -157,16 +173,19 @@ void Simulator::setRunner(std::string runnerType, size_t timeQuantum){
     }
     else{
         std::cout<<"Runner Type Invalid!\n";
+        std::cout.flush();
     }
 }
 
 void Simulator::start(){
     if(simulationRunning){
         std::cout<<"Simulation already running!";
+        std::cout.flush();
         return;
     }
     else{
         std::cout<<"Simulation started!\n";
+        std::cout.flush();
         simulationRunning.store(true);
 
         std::thread delayedAdd(&Simulator::addDelayedProcesses, this);
@@ -178,13 +197,10 @@ void Simulator::start(){
         schedulerThread.detach();
         runnerThread.detach();
     }
-    std::cout<<"Simulation finished!"<<std::endl;
-    displayStatistics();
-    displayExecutionLog();
 }
 
 void Simulator::onBurstTimeDecremented(size_t pid, size_t newTime){
-    emit signal_processBurstTimeUpdated(pid, newTime);
+    emit signal_processBurstTimeUpdated(pid, newTime/1000.0f);
 }
 
 void Simulator::simulationFinished(){
@@ -193,7 +209,7 @@ void Simulator::simulationFinished(){
 }
 
 void Simulator::updateSimulationTimeGUI(){
-    double newTime = simulationTimer.getTime_ms()/1000.0;
+    double newTime = simulationTimer.getTime_ms()/1000.0f;
     emit signal_updateSimulationTime(newTime);
 }
 
@@ -257,4 +273,14 @@ void Simulator::displayExecutionLog(){
 
 bool CompareByArrival::operator()(Process* a, Process* b) const {
     return a->arrival_time > b->arrival_time; // Min-heap: earlier time = higher priority
+}
+
+void Simulator::resetSimulationData(){
+    Process::resetID();
+    std::priority_queue<Process*, std::vector<Process*>, CompareByArrival> newDelayedQueue;
+    delayedQueue.swap(newDelayedQueue);
+    delayedProcesses.store(0);
+    executionLog.clear();
+    simulationTimer.resetTimer();
+    runnerFinished.store(false);
 }

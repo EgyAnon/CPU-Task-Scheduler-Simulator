@@ -5,20 +5,22 @@ void Scheduler::insertProcess(Process* newProcess){
 }
 
 void Scheduler::run(){
-    while(*delayedProcesses || !runnerFinished->load() || !scheduleQueue->empty()){
-        
+    while(delayedProcesses->load() || !runnerFinished->load() || !scheduleQueue->empty()){
         std::unique_lock<std::mutex> queueLock(*scheduleQueueMtx);
         
         queueCV->wait(queueLock, [this](){
-            return !scheduleQueue->empty() || (*delayedProcesses) == 0;
+            return !scheduleQueue->empty() || (delayedProcesses->load() == 0);
         });
 
         while(!scheduleQueue->empty()){
             //get the process from the front of the queue
+
             Process* newProcess = scheduleQueue->front();
+
             scheduleQueue->pop();
+
             queueLock.unlock(); //release the queue lock
-            
+
             if (this->isPreemptive) {
                 // 1. Request preemption
                 {
@@ -38,7 +40,6 @@ void Scheduler::run(){
                     });
                 }
             }
-            //std::cout<<"[Scheduler] Adding process P"<<newProcess->pid<<"\n";
             insertProcess(newProcess);
             (*delayedProcesses)--;
             queueLock.lock();
@@ -49,4 +50,5 @@ void Scheduler::run(){
         runnerPreempted->store(false);  // Reset for next preemption
         runnerCV->notify_one(); // Notify the runner that a new process is available
     }
+    std::cout<<"Scheduler Thread Finished!\n"; std::cout.flush();
 }

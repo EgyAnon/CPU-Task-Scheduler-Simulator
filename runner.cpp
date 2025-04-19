@@ -35,7 +35,6 @@ void Runner::run(){
                 if(!interrupted){
                     simulationTimer->incrementTime_ms(1000);
                     runningProcess->remaining_burst_time -= 1000;
-                    simulator->updateSimulationTimeGUI();
                     simulator->onBurstTimeDecremented(runningProcess->pid, runningProcess->remaining_burst_time);
                 }
             }
@@ -105,7 +104,6 @@ void Runner::run(){
                 );
                 if(!interrupted){
                     simulationTimer->incrementTime_ms(1000);
-                    simulator->updateSimulationTimeGUI();
                 }
                 /* std::cout<<"Current Time: "<<simulationTimer->getTime_s()<<"\n"; */
             }
@@ -117,6 +115,8 @@ void Runner::run(){
     }
     runnerFinished->store(true);
     simulator->simulationFinished();
+    std::cout<<"["<<simulationTimer->getTime_s()<<"| Runner] Runner Finished!\n";
+    std::cout.flush();
     //td::cout<<"[Runner] No more processes to run.\n";
 }
 
@@ -148,7 +148,6 @@ void Runner_RR::run(){
                 simulationTimer->incrementTime_ms(1000);
                 sleep_duration_ms-=1000;
                 runningProcess->remaining_burst_time -= 1000;
-                simulator->updateSimulationTimeGUI();
                 simulator->onBurstTimeDecremented(runningProcess->pid, runningProcess->remaining_burst_time);
             }
 
@@ -193,7 +192,6 @@ void Runner_RR::run(){
                 );
                 if(!interrupted){
                     simulationTimer->incrementTime_ms(500);
-                    simulator->updateSimulationTimeGUI();
                 }
             }
         }
