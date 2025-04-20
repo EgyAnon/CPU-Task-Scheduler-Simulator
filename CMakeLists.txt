@@ -14,6 +14,7 @@ qt_add_executable(Process_Scheduler_Simulator
     process.hpp runner.hpp scheduler.hpp simulator.cpp simulator.hpp timer.hpp
     process.cpp runner.cpp scheduler.cpp simulator.cpp
     timer.cpp
+    icon.png
 )
 
 target_link_libraries(Process_Scheduler_Simulator

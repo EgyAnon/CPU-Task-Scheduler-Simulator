@@ -42,13 +42,9 @@ void Runner::run(){
             size_t slice_end = simulationTimer->getTime_ms();
             
             if(slice_end != slice_start){
-                executionLog->push_back(
-                    std::make_tuple(
-                        runningProcess->pid,
-                        slice_start,
-                        slice_end
-                    )
-                );
+                std::tuple<size_t,size_t,size_t> log = std::make_tuple(runningProcess->pid,slice_start,slice_end);
+                executionLog->push_back(log);
+                simulator->updateLiveGanttChart(log);
             }
         
             else{
@@ -155,7 +151,9 @@ void Runner_RR::run(){
             
             //4. Store time slice in execution log
             if(slice_end != slice_start){
-                executionLog->push_back(std::make_tuple(runningProcess->pid, slice_start, slice_end));
+                std::tuple<size_t,size_t,size_t> log = std::make_tuple(runningProcess->pid,slice_start,slice_end);
+                executionLog->push_back(log);
+                simulator->updateLiveGanttChart(log);
             }
 
             else{

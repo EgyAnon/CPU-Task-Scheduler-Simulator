@@ -213,6 +213,10 @@ void Simulator::updateSimulationTimeGUI(){
     emit signal_updateSimulationTime(newTime);
 }
 
+void Simulator::updateLiveGanttChart(std::tuple<size_t,size_t,size_t> log){
+    emit signal_LiveGanttChart(log);
+}
+
 void Simulator::displayStatistics(){
     size_t totalTurnaroundTime = 0;
     size_t totalWaitingTime = 0;

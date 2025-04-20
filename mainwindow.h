@@ -32,6 +32,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    void updateGanttChartWindow();
+    void updateGanttChartWindow(std::tuple<size_t,size_t,size_t> log);
 };
 #endif // MAINWINDOW_H
