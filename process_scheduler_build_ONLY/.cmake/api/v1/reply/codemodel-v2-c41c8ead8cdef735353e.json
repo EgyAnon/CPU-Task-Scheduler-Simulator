@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-d7a1ffccc21d9532f3d4.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Process_Scheduler_Simulator",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Process_Scheduler_Simulator::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Process_Scheduler_Simulator-Release-47dfb414293f2d674204.json",
+					"name" : "Process_Scheduler_Simulator",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Process_Scheduler_Simulator_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Process_Scheduler_Simulator_autogen-Release-c1392479434aca9f4272.json",
+					"name" : "Process_Scheduler_Simulator_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Process_Scheduler_Simulator_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Process_Scheduler_Simulator_autogen_timestamp_deps-Release-a9a9869b19dd3db9acd6.json",
+					"name" : "Process_Scheduler_Simulator_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/College/Current Courses/OS/process_scheduler_build_ONLY",
+		"source" : "D:/College/Current Courses/OS/OS - Project/CPU-Task-Scheduler-Simulator"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

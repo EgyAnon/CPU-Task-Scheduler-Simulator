@@ -1,0 +1,9 @@
+D:/College/Current Courses/OS/process_scheduler_build_ONLY/CMakeFiles/Process_Scheduler_Simulator.dir
+D:/College/Current Courses/OS/process_scheduler_build_ONLY/CMakeFiles/edit_cache.dir
+D:/College/Current Courses/OS/process_scheduler_build_ONLY/CMakeFiles/rebuild_cache.dir
+D:/College/Current Courses/OS/process_scheduler_build_ONLY/CMakeFiles/list_install_components.dir
+D:/College/Current Courses/OS/process_scheduler_build_ONLY/CMakeFiles/install.dir
+D:/College/Current Courses/OS/process_scheduler_build_ONLY/CMakeFiles/install/local.dir
+D:/College/Current Courses/OS/process_scheduler_build_ONLY/CMakeFiles/install/strip.dir
+D:/College/Current Courses/OS/process_scheduler_build_ONLY/CMakeFiles/Process_Scheduler_Simulator_autogen_timestamp_deps.dir
+D:/College/Current Courses/OS/process_scheduler_build_ONLY/CMakeFiles/Process_Scheduler_Simulator_autogen.dir

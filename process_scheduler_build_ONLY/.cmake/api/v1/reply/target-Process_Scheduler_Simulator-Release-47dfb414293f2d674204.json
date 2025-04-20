@@ -1,0 +1,633 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "Process_Scheduler_Simulator.exe"
+		},
+		{
+			"path" : "Process_Scheduler_Simulator.pdb"
+		}
+	],
+	"backtrace" : 4,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"_qt_internal_create_executable",
+			"qt6_add_executable",
+			"qt_add_executable",
+			"install",
+			"target_link_libraries",
+			"set_target_properties",
+			"include",
+			"find_package",
+			"find_dependency",
+			"_qt_internal_find_qt_dependencies"
+		],
+		"files" : 
+		[
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6Core/Qt6CoreMacros.cmake",
+			"CMakeLists.txt",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsTargets.cmake",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsConfig.cmake",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6/Qt6Config.cmake",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6Core/Qt6CoreTargets.cmake",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6Core/Qt6CoreConfig.cmake",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6EntryPointPrivate/Qt6EntryPointPrivateTargets.cmake",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6EntryPointPrivate/Qt6EntryPointPrivateConfig.cmake",
+			"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6Core/Qt6CoreDependencies.cmake",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6Gui/Qt6GuiTargets.cmake",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6Gui/Qt6GuiConfig.cmake",
+			"C:/Qt/6.9.0/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsDependencies.cmake"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 8,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 938,
+				"parent" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 639,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 688,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 28,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 20,
+				"parent" : 0
+			},
+			{
+				"command" : 8,
+				"file" : 1,
+				"line" : 4,
+				"parent" : 0
+			},
+			{
+				"file" : 4,
+				"parent" : 7
+			},
+			{
+				"command" : 8,
+				"file" : 4,
+				"line" : 212,
+				"parent" : 8
+			},
+			{
+				"file" : 3,
+				"parent" : 9
+			},
+			{
+				"command" : 7,
+				"file" : 3,
+				"line" : 55,
+				"parent" : 10
+			},
+			{
+				"file" : 2,
+				"parent" : 11
+			},
+			{
+				"command" : 6,
+				"file" : 2,
+				"line" : 61,
+				"parent" : 12
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 640,
+				"parent" : 2
+			},
+			{
+				"command" : 8,
+				"file" : 4,
+				"line" : 212,
+				"parent" : 8
+			},
+			{
+				"file" : 6,
+				"parent" : 15
+			},
+			{
+				"command" : 7,
+				"file" : 6,
+				"line" : 57,
+				"parent" : 16
+			},
+			{
+				"file" : 5,
+				"parent" : 17
+			},
+			{
+				"command" : 6,
+				"file" : 5,
+				"line" : 61,
+				"parent" : 18
+			},
+			{
+				"command" : 7,
+				"file" : 6,
+				"line" : 45,
+				"parent" : 16
+			},
+			{
+				"file" : 11,
+				"parent" : 20
+			},
+			{
+				"command" : 10,
+				"file" : 11,
+				"line" : 46,
+				"parent" : 21
+			},
+			{
+				"command" : 9,
+				"file" : 10,
+				"line" : 137,
+				"parent" : 22
+			},
+			{
+				"command" : 8,
+				"file" : 9,
+				"line" : 76,
+				"parent" : 23
+			},
+			{
+				"file" : 8,
+				"parent" : 24
+			},
+			{
+				"command" : 7,
+				"file" : 8,
+				"line" : 55,
+				"parent" : 25
+			},
+			{
+				"file" : 7,
+				"parent" : 26
+			},
+			{
+				"command" : 6,
+				"file" : 7,
+				"line" : 61,
+				"parent" : 27
+			},
+			{
+				"command" : 6,
+				"file" : 7,
+				"line" : 83,
+				"parent" : 27
+			},
+			{
+				"command" : 7,
+				"file" : 3,
+				"line" : 43,
+				"parent" : 10
+			},
+			{
+				"file" : 14,
+				"parent" : 30
+			},
+			{
+				"command" : 10,
+				"file" : 14,
+				"line" : 45,
+				"parent" : 31
+			},
+			{
+				"command" : 9,
+				"file" : 10,
+				"line" : 137,
+				"parent" : 32
+			},
+			{
+				"command" : 8,
+				"file" : 9,
+				"line" : 76,
+				"parent" : 33
+			},
+			{
+				"file" : 13,
+				"parent" : 34
+			},
+			{
+				"command" : 7,
+				"file" : 13,
+				"line" : 55,
+				"parent" : 35
+			},
+			{
+				"file" : 12,
+				"parent" : 36
+			},
+			{
+				"command" : 6,
+				"file" : 12,
+				"line" : 61,
+				"parent" : 37
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-O3 -DNDEBUG -fdiagnostics-color=always"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 14,
+					"define" : "MINGW_HAS_SECURE_API=1"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "QT_CORE_LIB"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "QT_GUI_LIB"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "QT_NEEDS_QMAIN"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "QT_NO_DEBUG"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "QT_WIDGETS_LIB"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "UNICODE"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "WIN32"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "WIN64"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "_ENABLE_EXTENDED_ALIGNED_STORAGE"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "_UNICODE"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "_WIN64"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 0,
+					"path" : "D:/College/Current Courses/OS/process_scheduler_build_ONLY/Process_Scheduler_Simulator_autogen/include"
+				},
+				{
+					"backtrace" : 14,
+					"isSystem" : true,
+					"path" : "C:/Qt/6.9.0/mingw_64/include/QtCore"
+				},
+				{
+					"backtrace" : 14,
+					"isSystem" : true,
+					"path" : "C:/Qt/6.9.0/mingw_64/include"
+				},
+				{
+					"backtrace" : 14,
+					"isSystem" : true,
+					"path" : "C:/Qt/6.9.0/mingw_64/mkspecs/win32-g++"
+				},
+				{
+					"backtrace" : 6,
+					"isSystem" : true,
+					"path" : "C:/Qt/6.9.0/mingw_64/include/QtWidgets"
+				},
+				{
+					"backtrace" : 6,
+					"isSystem" : true,
+					"path" : "C:/Qt/6.9.0/mingw_64/include/QtGui"
+				}
+			],
+			"language" : "CXX",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				8,
+				11,
+				12,
+				13,
+				14
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 0,
+			"id" : "Process_Scheduler_Simulator_autogen::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "Process_Scheduler_Simulator_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
+		}
+	],
+	"id" : "Process_Scheduler_Simulator::@6890427a1f51a3e7e1df",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 5,
+				"path" : "bin"
+			}
+		],
+		"prefix" : 
+		{
+			"path" : "C:/Program Files (x86)/Process_Scheduler_Simulator"
+		}
+	},
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-O3 -DNDEBUG",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "-mwindows",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 6,
+				"fragment" : "C:\\Qt\\6.9.0\\mingw_64\\lib\\libQt6Widgets.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 13,
+				"fragment" : "C:\\Qt\\6.9.0\\mingw_64\\lib\\libQt6Gui.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 14,
+				"fragment" : "C:\\Qt\\6.9.0\\mingw_64\\lib\\libQt6Core.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 19,
+				"fragment" : "-lmpr",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 19,
+				"fragment" : "-luserenv",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 28,
+				"fragment" : "-lmingw32",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 28,
+				"fragment" : "C:\\Qt\\6.9.0\\mingw_64\\lib\\libQt6EntryPoint.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 29,
+				"fragment" : "-lshell32",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 38,
+				"fragment" : "-ld3d11",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 38,
+				"fragment" : "-ldxgi",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 38,
+				"fragment" : "-ldxguid",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 38,
+				"fragment" : "-ld3d12",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "Process_Scheduler_Simulator",
+	"nameOnDisk" : "Process_Scheduler_Simulator.exe",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files\\Generated",
+			"sourceIndexes" : 
+			[
+				0,
+				15,
+				16
+			]
+		},
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				1,
+				2,
+				8,
+				11,
+				12,
+				13,
+				14
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				3,
+				5,
+				6,
+				7,
+				9,
+				10
+			]
+		},
+		{
+			"name" : "Forms",
+			"sourceIndexes" : 
+			[
+				4
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				17
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 0,
+			"compileGroupIndex" : 0,
+			"isGenerated" : true,
+			"path" : "D:/College/Current Courses/OS/process_scheduler_build_ONLY/Process_Scheduler_Simulator_autogen/mocs_compilation.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "main.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "mainwindow.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "mainwindow.h",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"path" : "mainwindow.ui",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 4,
+			"path" : "process.hpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"path" : "runner.hpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"path" : "scheduler.hpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "simulator.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "simulator.hpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"path" : "timer.hpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "process.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "runner.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "scheduler.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "timer.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "D:/College/Current Courses/OS/process_scheduler_build_ONLY/Process_Scheduler_Simulator_autogen/include/ui_mainwindow.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "D:/College/Current Courses/OS/process_scheduler_build_ONLY/Process_Scheduler_Simulator_autogen/timestamp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "D:/College/Current Courses/OS/process_scheduler_build_ONLY/Process_Scheduler_Simulator_autogen/timestamp.rule",
+			"sourceGroupIndex" : 4
+		}
+	],
+	"type" : "EXECUTABLE"
+}
