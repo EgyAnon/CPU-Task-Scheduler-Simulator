@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project simulates various CPU scheduling algorithms in an interactive desktop application. The application provides a graphical user interface (GUI) built using Qt and supports dynamic process addition while the scheduler is running. The simulation operates in real-time, with each unit of time mapped to 1 second, and updates the remaining burst time table live. The application uses multithreading in the backend to handle the scheduling logic independently of the GUI, ensuring a smooth user experience without interface lag.
+This project simulates various CPU scheduling algorithms in an interactive desktop application. The application provides a graphical user interface (GUI) built using Qt and supports dynamic process addition while the scheduler is running. The simulation operates in real-time, with each unit of time mapped to 1 second, and updates the remaining burst time table live. The application uses multithreading in the backend to handle the scheduling logic, ensuring a smooth user experience without interface lag.
 
 The implemented CPU schedulers include:
 - **First-Come, First-Served (FCFS)**
@@ -10,7 +10,7 @@ The implemented CPU schedulers include:
 - **Priority Scheduling** (Preemptive and Non-Preemptive) *(smaller priority numbers indicate higher priority)*
 - **Round Robin (RR)**
 
----
+---  
 
 ## Features
 
@@ -27,6 +27,8 @@ The implemented CPU schedulers include:
 - **Live Scheduling**: Simulate the scheduling process in real-time, with each unit of time mapped to 1 second.
 - **Non-Live Mode**: Option to run all existing processes without live scheduling.
 - **Remaining Burst Time Table**: Updated live as the simulation progresses.
+- **Instant Simulation Termination**: Allows users to stop the simulation immediately and view the final results without waiting for all processes to complete.
+- **Reset**: Clears all simulation data, allowing users to start a new simulation from scratch.
 
 ### Outputs
 1. **Gantt Chart**: Visual representation of the order and duration of each process.
@@ -82,6 +84,4 @@ To further improve this project, the following features can be implemented:
 ---
 
 ## Acknowledgments
-
-- Thanks to the **Qt framework** for enabling the creation of a responsive and user-friendly GUI.
-- Special thanks to our course instructor for providing the project guidelines and support.
+Special thanks to our course instructor for providing the project guidelines and support.
