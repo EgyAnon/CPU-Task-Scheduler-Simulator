@@ -52,8 +52,8 @@ The implemented CPU schedulers include:
 
 ## Technology Stack
 
-- **Programming Language**: C++ (Supports C++17 or later)
-- **GUI Framework**: Qt (Version 5.15 or later)
+- **Programming Language**: C++ 
+- **GUI Framework**: Qt 
 
 ---
 
