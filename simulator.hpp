@@ -18,6 +18,7 @@ class Simulator : public QObject
     void signal_processBurstTimeUpdated(size_t pid, double newTime);
     void signal_simulationFinished(std::tuple<double,double,double> result);
     void signal_updateSimulationTime(double);
+    void signal_LiveGanttChart(std::tuple<size_t,size_t,size_t> log);
 
     private: 
     /*  Main Actors */
@@ -74,6 +75,7 @@ class Simulator : public QObject
     void simulationFinished();
     void updateSimulationTimeGUI();
     void resetSimulationData();
+    void updateLiveGanttChart(std::tuple<size_t,size_t,size_t> log);
 
     void start();
     

@@ -18,6 +18,8 @@ MainWindow::MainWindow(Simulator& _simulator, QWidget *parent)
     connect(&simulator, &Simulator::signal_processBurstTimeUpdated, this, &MainWindow::updateBurstTime);
     connect(&simulator, &Simulator::signal_simulationFinished, this, &MainWindow::on_simulationFinished);
     connect(&simulator, &Simulator::signal_updateSimulationTime, this, &MainWindow::on_updateSimulationTime);
+    connect(&simulator, &Simulator::signal_LiveGanttChart, this, &MainWindow::updateGanttChartWindow);
+
 
     QGraphicsScene *scene = new QGraphicsScene(this);
     ui->GanttChartWindow->setScene(scene);
@@ -170,6 +172,7 @@ void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
 void MainWindow::on_pushButton_StartSimulation_released()
 {
     ui->pushButton_StartSimulation->setDisabled(true);
+    ui->label_ProgramMessages->clear();
     QString currentScheduler = ui->comboBox->currentText();
 
     if(currentScheduler == "Round-Robin"){
@@ -237,7 +240,6 @@ void MainWindow::on_simulationFinished(std::tuple<double,double,double> result){
     ui->pushButton_StartSimulation->setEnabled(true);
     ui->pushButton_reset->setEnabled(true);
 
-    this->updateGanttChartWindow();
     ui->textEdit_Statistics->setText(
         "Average Turnaround: " + QString::number(std::get<0>(result)) + "\n"
         +"Average Waiting Time: " + QString::number(std::get<1>(result)) + "\n"
@@ -245,50 +247,44 @@ void MainWindow::on_simulationFinished(std::tuple<double,double,double> result){
     );
 }
 
-void MainWindow::updateGanttChartWindow(){
-    // Clear existing chart
-    ui->GanttChartWindow->scene()->clear();
+void MainWindow::updateGanttChartWindow(std::tuple<size_t,size_t,size_t> log){
+    int pid = std::get<0>(log);
+    int startTime = std::get<1>(log) / 1000; // Convert milliseconds to seconds
+    int endTime = std::get<2>(log) / 1000;   // Convert milliseconds to seconds
 
-    // Add new data points
-    for (const auto& log : simulator.executionLog) {
-        int pid = std::get<0>(log);
-        int startTime = std::get<1>(log) / 1000; // Convert milliseconds to seconds
-        int endTime = std::get<2>(log) / 1000;   // Convert milliseconds to seconds
+    // Draw a rectangle for the process
+    QGraphicsRectItem *rect = new QGraphicsRectItem(startTime * 50, 0, (endTime - startTime) * 50, 50);
+    rect->setBrush(QBrush(Qt::gray));
+    ui->GanttChartWindow->scene()->addItem(rect);
 
-        // Draw a rectangle for the process
-        QGraphicsRectItem *rect = new QGraphicsRectItem(startTime * 50, 0, (endTime - startTime) * 50, 50);
-        rect->setBrush(QBrush(Qt::gray));
-        ui->GanttChartWindow->scene()->addItem(rect);
+    // Calculate the center position of the rectangle
+    double centerX = (startTime + (endTime - startTime) / 2.0) * 50; // Center X-coordinate
+    QString processName = QString("P%1").arg(pid);                  // Process name (e.g., "P1")
+    QGraphicsSimpleTextItem *processLabel = new QGraphicsSimpleTextItem(processName);
 
-        // Calculate the center position of the rectangle
-        double centerX = (startTime + (endTime - startTime) / 2.0) * 50; // Center X-coordinate
-        QString processName = QString("P%1").arg(pid);                  // Process name (e.g., "P1")
-        QGraphicsSimpleTextItem *processLabel = new QGraphicsSimpleTextItem(processName);
+    // Set font size and make it bold
+    QFont font = processLabel->font();
+    font.setPointSize(12); // Increase font size
+    font.setBold(true);   // Make the text bold
+    processLabel->setFont(font);
 
-        // Set font size and make it bold
-        QFont font = processLabel->font();
-        font.setPointSize(12); // Increase font size
-        font.setBold(true);   // Make the text bold
-        processLabel->setFont(font);
+    // Adjust the text position to center it
+    double textWidth = processLabel->boundingRect().width(); // Width of the text
+    double textHeight = processLabel->boundingRect().height(); // Height of the text
+    processLabel->setPos(centerX - textWidth / 2, 25 - textHeight / 2); // Center the text
+    ui->GanttChartWindow->scene()->addItem(processLabel);
 
-        // Adjust the text position to center it
-        double textWidth = processLabel->boundingRect().width(); // Width of the text
-        double textHeight = processLabel->boundingRect().height(); // Height of the text
-        processLabel->setPos(centerX - textWidth / 2, 25 - textHeight / 2); // Center the text
-        ui->GanttChartWindow->scene()->addItem(processLabel);
+    // Add start time label
+    QGraphicsSimpleTextItem *startTimeLabel = new QGraphicsSimpleTextItem(QString::number(startTime));
+    startTimeLabel->setFont(font); // Use the same font as the process name
+    startTimeLabel->setPos(startTime * 50, 60); // Position below the rectangle
+    ui->GanttChartWindow->scene()->addItem(startTimeLabel);
 
-        // Add start time label
-        QGraphicsSimpleTextItem *startTimeLabel = new QGraphicsSimpleTextItem(QString::number(startTime));
-        startTimeLabel->setFont(font); // Use the same font as the process name
-        startTimeLabel->setPos(startTime * 50, 60); // Position below the rectangle
-        ui->GanttChartWindow->scene()->addItem(startTimeLabel);
-
-        // Add end time label
-        QGraphicsSimpleTextItem *endTimeLabel = new QGraphicsSimpleTextItem(QString::number(endTime));
-        endTimeLabel->setFont(font); // Use the same font as the process name
-        endTimeLabel->setPos(endTime * 50, 60); // Position below the rectangle
-        ui->GanttChartWindow->scene()->addItem(endTimeLabel);
-    }
+    // Add end time label
+    QGraphicsSimpleTextItem *endTimeLabel = new QGraphicsSimpleTextItem(QString::number(endTime));
+    endTimeLabel->setFont(font); // Use the same font as the process name
+    endTimeLabel->setPos(endTime * 50, 60); // Position below the rectangle
+    ui->GanttChartWindow->scene()->addItem(endTimeLabel);
 }
 
 void MainWindow::on_checkBox_instantSimulation_checkStateChanged(const Qt::CheckState &arg1)
@@ -311,6 +307,7 @@ void MainWindow::on_pushButton_reset_released()
     //1. Clear Data From Backend
     simulator.resetSimulationData();
 
+
     //2. Clear GUI Data
 
     //2.1 Clear Gantt Chart
@@ -322,4 +319,7 @@ void MainWindow::on_pushButton_reset_released()
 
     //2.3 Clear Statistics
     ui->textEdit_Statistics->clear();
+
+    //2.4 Clear Error Message
+    ui->label_ProgramMessages->clear();
 }
