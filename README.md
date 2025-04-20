@@ -38,6 +38,16 @@ The implemented CPU schedulers include:
 
 ---
 
+## Screenshots
+
+### Main Interface
+![Main Interface](screenshots/main_interface.png)
+
+### Output
+![Output](screenshots/output.png)
+
+---
+
 ## Technology Stack
 
 - **Programming Language**: C++ (Supports C++17 or later)
